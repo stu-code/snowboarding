@@ -55,26 +55,6 @@ data gps_filtered;
     drop start end type numberOfType rc;
 run;
 
-/* Add in types: lift or run */
-proc sql;
-    create table a as
-        select gps.*
-             , meta.type
-             , CASE(meta.type)
-                    when('Lift') then meta.numberOfType
-                    else .
-               END as lift_nbr
-             , CASE(meta.type)
-                    when('Run') then meta.numberOfType
-                    else .
-               END as run_nbr
-        from pq.gps
-        INNER JOIN
-             pq.gps_meta as meta
-        ON gps.timestamp BETWEEN meta.start AND meta.end
-    ;
-quit;
-
 /* De-dupe timestamps and output */
 proc sort data=snowboarding_gps_hr 
           out=out.snowboarding_gps_hr

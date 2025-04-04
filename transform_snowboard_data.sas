@@ -55,14 +55,35 @@ data gps_filtered;
     drop start end type numberOfType rc;
 run;
 
+/* Fuzzy merge GPS with heartrate data */
+proc sql;
+    create table snowboarding_gps_hr(drop=dif) as
+        select round(gps.timestamp) as timestamp format=datetime.2
+             , gps.lat
+             , gps.lon
+             , gps.elevation*3.28084 as elevation /* Convert from Meters to Feet */
+             , speed
+             , hr.bpm
+             , hr.confidence as hr_sensor_confidence
+             , abs(round(hr.timestamp) - round(gps.timestamp)) as dif
+        from gps_filtered as gps
+        LEFT JOIN
+             hr
+        ON   dhms(datepart(gps.timestamp), hour(gps.timestamp), minute(gps.timestamp), 0)
+           = dhms(datepart(hr.timestamp), hour(hr.timestamp), minute(hr.timestamp), 0)
+        group by calculated timestamp
+        having dif = min(dif)
+    ;
+quit;
+
 /* De-dupe timestamps and output */
 proc sort data=snowboarding_gps_hr 
-          out=out.snowboarding_gps_hr
+          out=out.snowboarding_gps_hr(compress=yes) 
           nodupkey;
     by timestamp;
 run;
 
 /* Convert to sas7bdat */
-data out.gps_meta;
+data out.gps_meta(compress=yes);
     set pq.gps_meta;
 run;

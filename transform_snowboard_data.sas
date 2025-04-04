@@ -6,17 +6,19 @@ libname out '/workspaces/myfolder/data';
 data hr;
     set pq.hr;
 
+    date = datepart(timestamp);
+
     /* Convert to MT */
-    if(   '25JAN2024'd LE datepart(timestamp) LE '28JAN2024'd
-       OR '13MAR2025'd LE datepart(timestamp) LE '15MAR2025'd)
-    then timestamp = intnx('hour', timestamp, -7, 'S')
-    ;
+    if(   '25JAN2024'd <= date <= '28JAN2024'd
+       OR '13MAR2025'd <= date <= '15MAR2025'd)
+    then timestamp = intnx('hour', timestamp, -7, 'S');
 
     /* Convert to ET */
-    else if(   '23FEB2024'd LE datepart(timestamp) LE '24FEB2024'd 
-            OR '09FEB2025'd LE datepart(timestamp) LE '10FEB2025'd)
-    then timestamp = intnx('hour', timestamp, -5, 'S')
-    ;
+    else if(   '23FEB2024'd <= date <= '24FEB2024'd 
+            OR '09FEB2025'd <= date <= '10FEB2025'd)
+    then timestamp = intnx('hour', timestamp, -5, 'S');
+    
+    drop date;
 run;
 
 /* Filter all rows to only be between the start and end of each run */
@@ -67,9 +69,9 @@ proc sql;
              , hr.confidence as hr_sensor_confidence
              , abs(round(hr.timestamp) - round(gps.timestamp)) as dif
         from gps_filtered as gps
-        LEFT JOIN
+        left join
              hr
-        ON   dhms(datepart(gps.timestamp), hour(gps.timestamp), minute(gps.timestamp), 0)
+        on   dhms(datepart(gps.timestamp), hour(gps.timestamp), minute(gps.timestamp), 0)
            = dhms(datepart(hr.timestamp), hour(hr.timestamp), minute(hr.timestamp), 0)
         group by calculated timestamp
         having dif = min(dif)

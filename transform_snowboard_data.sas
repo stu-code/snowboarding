@@ -19,54 +19,65 @@ data hr;
     ;
 run;
 
-/* Fuzzy merge GPS with heartrate data */
-proc sql;
-    create table _snowboarding_gps_hr(drop=dif) as
-        select round(gps.timestamp) as timestamp format=datetime.2
-             , datepart(gps.timestamp) as date format=date9.
-             , gps.lat
-             , gps.lon
-             , round(gps.elevation)*3.28084 as elevation /* Convert from Meters to Feet */
-             , round(gps.speed, .1) as speed
-             , hr.bpm
-             , hr.confidence as hr_sensor_confidence
-             , abs(round(hr.timestamp) - round(gps.timestamp)) as dif
-        from pq.gps
-        LEFT JOIN
-             hr
-        ON   dhms(datepart(gps.timestamp), hour(gps.timestamp), minute(gps.timestamp), 0)
-           = dhms(datepart(hr.timestamp), hour(hr.timestamp), minute(hr.timestamp), 0)
-        where    timepart(hr.timestamp) BETWEEN '8:30't AND '16:00't      /* Retrieve some missing data */
-              OR datepart(gps.timestamp) IN ('27JAN2024'd, '28JAN2024'd)  /* Retrieve some missing data */
-        group by calculated timestamp
-        having dif = min(dif)
-    ;
-quit;
+/* Filter all rows to only be between the start and end of each run */
+data gps_filtered;
+    set pq.gps;
+
+    if(_N_ = 1) then do;
+        format type $10.;
+
+        dcl hash meta(dataset: 'pq.gps_meta', ordered: 'yes');
+            meta.defineKey('start', 'end');
+            meta.defineData('start', 'end', 'type', 'numberOfType');
+        meta.defineDone();
+
+        dcl hiter iter('meta');
+
+        call missing(start, end, type, numberOfType);
+    end;
+
+    rc = iter.first();
+
+    do while(rc = 0);
+        if(start <= timestamp <= end) then do;
+
+            /* Identify lifts or runs */
+            if(type = 'Run') then run_nbr = numberOfType;
+                else lift_nbr = numberOfType;
+
+            output;
+            leave;
+        end;
+
+        rc = iter.next();
+    end;
+
+    drop start end type numberOfType rc;
+run;
 
 /* Add in types: lift or run */
 proc sql;
-    create table snowboarding_gps_hr as
+    create table a as
         select gps.*
-               , meta.type
-               , CASE(meta.type)
-                     when('Lift') then meta.numberOfType
-                     else .
-                 END as lift_nbr
-               , CASE(meta.type)
-                     when('Run') then meta.numberOfType
-                     else .
-                 END as run_nbr
-        from _snowboarding_gps_hr as gps
-        LEFT JOIN
+             , meta.type
+             , CASE(meta.type)
+                    when('Lift') then meta.numberOfType
+                    else .
+               END as lift_nbr
+             , CASE(meta.type)
+                    when('Run') then meta.numberOfType
+                    else .
+               END as run_nbr
+        from pq.gps
+        INNER JOIN
              pq.gps_meta as meta
         ON gps.timestamp BETWEEN meta.start AND meta.end
-        order by gps.timestamp
     ;
 quit;
 
 /* De-dupe timestamps and output */
 proc sort data=snowboarding_gps_hr 
-          out=out.snowboarding_gps_hr(compress=yes) 
+          out=out.snowboarding_gps_hr
           nodupkey;
     by timestamp;
 run;

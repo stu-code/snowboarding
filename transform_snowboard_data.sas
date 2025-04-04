@@ -9,13 +9,13 @@ data hr;
     /* Convert to MT */
     if(   '25JAN2024'd LE datepart(timestamp) LE '28JAN2024'd
        OR '13MAR2025'd LE datepart(timestamp) LE '15MAR2025'd)
-        then timestamp = intnx('hour', timestamp, -7, 'S')
+    then timestamp = intnx('hour', timestamp, -7, 'S')
     ;
 
     /* Convert to ET */
     else if(   '23FEB2024'd LE datepart(timestamp) LE '24FEB2024'd 
             OR '09FEB2025'd LE datepart(timestamp) LE '10FEB2025'd)
-        then timestamp = intnx('hour', timestamp, -5, 'S')
+    then timestamp = intnx('hour', timestamp, -5, 'S')
     ;
 run;
 

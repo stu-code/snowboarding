@@ -24,6 +24,7 @@ run;
 /* Filter all rows to only be between the start and end of each run */
 data gps_filtered;
     set pq.gps;
+    retain start end type numberOfType rc;
 
     if(_N_ = 1) then do;
         format type $10.;
@@ -36,22 +37,21 @@ data gps_filtered;
         dcl hiter iter('meta');
 
         call missing(start, end, type, numberOfType);
+
+        /* Get the first value from the hash table */
+        rc = iter.first();
     end;
 
-    rc = iter.first();
+    /* If we'ved to a new run, get the next timestamp */
+    if(timestamp > end) then rc = iter.next();
 
-    do while(rc = 0);
-        if(start <= timestamp <= end) then do;
-
-            /* Identify lifts or runs */
-            if(type = 'Run') then run_nbr = numberOfType;
-                else lift_nbr = numberOfType;
-
-            output;
-            leave;
-        end;
-
-        rc = iter.next();
+    /* As long as there's a value from the hash table and the
+       GPS timestamp is between the start/end points of the
+       metadata timestamp, then get the run/lift number and output */
+    if(rc = 0 and start <= timestamp <= end) then do;
+        if(type = 'Run') then run_nbr = numberOfType;
+            else lift_nbr = numberOfType;
+        output;
     end;
 
     drop start end type numberOfType rc;
@@ -63,8 +63,10 @@ proc sql;
         select round(gps.timestamp) as timestamp format=datetime.2
              , gps.lat
              , gps.lon
-             , gps.elevation*3.28084 as elevation /* Convert from Meters to Feet */
-             , speed
+             , gps.lift_nbr
+             , gps.run_nbr
+             , gps.elevation*3.28084 as elevation
+             , gps.speed
              , hr.bpm
              , hr.confidence as hr_sensor_confidence
              , abs(round(hr.timestamp) - round(gps.timestamp)) as dif
@@ -85,7 +87,12 @@ proc sort data=snowboarding_gps_hr
     by timestamp;
 run;
 
-/* Convert to sas7bdat */
+/* Save main dataset as parquet */
+data pq.snowboarding_gps_hr;
+    set out.snowboarding_gps_hr;
+run;
+
+/* Convert GPA metadata to sas7bdat */
 data out.gps_meta(compress=yes);
     set pq.gps_meta;
 run;

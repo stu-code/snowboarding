@@ -14,8 +14,9 @@
 */
 
 /* Location of input and output datasets */
-libname pq parquet '/workspaces/myfolder/data'; /* Input */
-libname out '/workspaces/myfolder/data';        /* Output */
+libname pq parquet '/workspaces/myfolder/data';             /* Input */
+libname out '/workspaces/myfolder/snowboarding/data/final'; /* Output */
+libname outpq parquet '/workspaces/myfolder/snowboarding/data/final'; /* Output (parquet) */
 
 /* Fix timestamps in Heart Rate data */
 data hr;
@@ -105,8 +106,13 @@ proc sort data=snowboarding_gps_hr
 run;
 
 /* Save main dataset as parquet */
-data pq.snowboarding_gps_hr;
+data outpq.snowboarding_gps_hr;
     set out.snowboarding_gps_hr;
+run;
+
+/* Copy pq gps meta to final output location */
+data outpq.gps_meta;
+    set pq.gps_meta;
 run;
 
 /* Convert GPA metadata to SAS dataset */

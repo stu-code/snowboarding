@@ -1,5 +1,21 @@
-libname pq parquet '/workspaces/myfolder/data';
-libname out '/workspaces/myfolder/data';
+/* The purpose of this program is to transform Slopes GPS, GPS Metadata, and 
+   FitBit heart rate data into a format for analysis. This program does the following:
+   
+   1. Converts timestamps in heart rate data to MT or ET, depending on date
+   2. Merges GPS metadata to GPS data to identify lifts and runs, and remove unneeded timestamps
+   3. Fuzzy-merges GPS data with heart rate data such that the heart rate timestamp is with the closest GPS timestamp 
+
+   This program should be run after extract_snowboard_data.ipynb
+
+   Expected Datasets:
+       - pq.hr       | FitBit heart rate data in Parquet format
+       - pq.gps      | GPS data in Parquet format
+       - pq.gpa_meta | GPS metadata in Parquet format
+*/
+
+/* Location of input and output datasets */
+libname pq parquet '/workspaces/myfolder/data'; /* Input */
+libname out '/workspaces/myfolder/data';        /* Output */
 
 /* Fix timestamps in Heart Rate data */
 data hr;

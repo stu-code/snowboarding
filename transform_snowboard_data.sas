@@ -1,8 +1,7 @@
-
 libname pq parquet '/workspaces/myfolder/data';
 libname out '/workspaces/myfolder/data';
 
-/* Fix timestamps in Heartrate data */
+/* Fix timestamps in Heart Rate data */
 data hr;
     set pq.hr;
 
@@ -21,13 +20,14 @@ data hr;
     drop date;
 run;
 
-/* Filter all rows to only be between the start and end of each run */
+/* Determine run or lift number for each timestamp and filter out
+   timestamps that aren't a part of GPS metadata intervals */
 data gps_filtered;
     set pq.gps;
     retain start end type numberOfType rc;
 
     if(_N_ = 1) then do;
-        format type $10.;
+        length type $4.;
 
         dcl hash meta(dataset: 'pq.gps_meta', ordered: 'yes');
             meta.defineKey('start', 'end');
@@ -57,7 +57,8 @@ data gps_filtered;
     drop start end type numberOfType rc;
 run;
 
-/* Fuzzy merge GPS with heartrate data */
+/* Fuzzy merge GPS with heartrate data by associating the heart rate with the
+   nearest GPS timestamp */
 proc sql;
     create table snowboarding_gps_hr(drop=dif) as
         select round(gps.timestamp) as timestamp format=datetime.2
@@ -92,7 +93,7 @@ data pq.snowboarding_gps_hr;
     set out.snowboarding_gps_hr;
 run;
 
-/* Convert GPA metadata to sas7bdat */
+/* Convert GPA metadata to SAS dataset */
 data out.gps_meta(compress=yes);
     set pq.gps_meta;
 run;

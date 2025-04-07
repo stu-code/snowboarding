@@ -110,12 +110,12 @@ data outpq.snowboarding_gps_hr;
     set out.snowboarding_gps_hr;
 run;
 
-/* Copy pq gps meta to final output location */
+/* Copy pq GPS metadata to final output location */
 data outpq.gps_meta;
     set pq.gps_meta;
 run;
 
-/* Convert GPA metadata to SAS dataset */
+/* Convert GPS metadata to SAS dataset */
 data out.gps_meta(compress=yes);
     set pq.gps_meta;
 run;

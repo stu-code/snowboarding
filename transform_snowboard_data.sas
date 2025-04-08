@@ -14,8 +14,8 @@
 */
 
 /* Location of input and output datasets */
-libname pq parquet '/workspaces/myfolder/data';             /* Input */
-libname out '/workspaces/myfolder/snowboarding/data/final'; /* Output */
+libname pq parquet '/workspaces/myfolder/stage';             /* Input */
+libname out '/workspaces/myfolder/snowboarding/data/final';  /* Output */
 libname outpq parquet '/workspaces/myfolder/snowboarding/data/final'; /* Output (parquet) */
 
 /* Fix timestamps in Heart Rate data */

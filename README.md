@@ -6,7 +6,7 @@ This project uses heart rate data collected from a Pixel Watch 2 (FitBit app) an
 
 Mobile is not supported at this time and is best viewed on a desktop.
 
-[View my snowboarding dashboard on github.io](https://stu-code.github.io/snowboarding-dashboard/)
+<a href="https://stu-code.github.io/snowboarding-dashboard" target="_blank">View my snowboarding dashboard on github.io</a>
 
 ![image](https://github.com/user-attachments/assets/6234e24a-7de9-4121-a63b-b3e585908505)
 ![image](https://github.com/user-attachments/assets/33b77bbc-7f90-458a-9232-6a2c873f587c)

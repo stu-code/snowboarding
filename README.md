@@ -1,7 +1,7 @@
 # Snowboarding Statistics and Biometric Data
 This project uses my heart rate data collected from a Pixel Watch 2 (FitBit app) and GPS data from the [Slopes app](https://getslopes.com/) to create a dashboard that allows me to explore my snowboarding metrics, such as speed, heart rate, places I am fastest, and more. This project is an exercise in learning how to create a repeatable pipeline that extracts and merges disparate data formats using multiple programming languages, then visualize the data in interactive dashboard to explore my metrics. I'll be updating this each season as I go on more trips.
 
-[Check out my blog about this project this to learn more](https://blogs.sas.com/content/sgf/2025/04/18/from-slopes-to-stats/).
+[Check out my blog about this project this to learn how I built this](https://blogs.sas.com/content/sgf/2025/04/18/from-slopes-to-stats/).
 
 # Dashboard
 **You must disable your ad blockers for the dashboard to render, otherwise you will get a blank screen**

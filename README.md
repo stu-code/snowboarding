@@ -38,4 +38,5 @@ Data is located in the **data** folder
                |--------- [data]
                             |----- [gps]
                             |----- [hr]
+                            |----- [final]
 ```

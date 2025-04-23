@@ -21,7 +21,7 @@ Mobile is not supported at this time and is best viewed on a desktop.
 Data is located in the **data** folder
 1. `final` - Final transformed datasets in parquet and sas7bdat format (UTF-8)
 2. `gps` - GPS data in [gpx format](https://wiki.openstreetmap.org/wiki/GPX#:~:text=GPX%2C%20or%20GPS%20exchange%20format,and%20be%20used%20during%20editing.) and GPS metadata .slopes format (zip file)
-3. `hr` - FitBit app heart rate data in .csv format downloaded from Google Takeout
+3. `hr` - FitBit app heart rate data in csv format downloaded from Google Takeout
 
 # Programs
 1. `extract_snowboard_data.ipynb` - Extracts data with Python to stage it for final transformation

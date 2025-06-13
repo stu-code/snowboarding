@@ -1,0 +1,4 @@
+python>=3.11
+dateutil==2.9.0
+pandas==2.2.3
+requests==2.31.0

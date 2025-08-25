@@ -27,6 +27,7 @@ Data is located in the **data** folder
 1. `extract_snowboard_data.ipynb` - Extracts data with Python to stage it for final transformation
 2. `transform_snowboard_data.sas` - Transforms data with SAS into a format for dashboarding in SAS Visual Analytics
 3. `extract_transform_snowboard_data.sasnb` - A SAS Notebook that can be used with the SAS VS Code Extension to run both (1) and (2) in one notebook on SAS Viya
+4. `extract_transform_snowboard_data.flw` - A SAS Studio Flow that can be imported into SAS Studio to run both (1) and (2) in a single pipeline
 
 # Expected Folder Structure
 ```
